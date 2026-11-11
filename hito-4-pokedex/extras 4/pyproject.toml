@@ -1,0 +1,32 @@
+[project]
+name = "pokedex-api"
+version = "0.1.0"
+description = "API REST del Pokédex personal · Práctica guiada M2C3 (UFV)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "bcrypt>=5.0.0",
+    "fastapi[standard]>=0.148.0",
+    "httpx>=0.28.1",
+    "pydantic-settings>=2.16.0",
+    "python-jose[cryptography]>=3.5.0",
+    "slowapi>=0.1.10",
+    "sqlmodel>=0.0.48",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.17.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 88
+
+[tool.coverage.run]
+source = ["app"]

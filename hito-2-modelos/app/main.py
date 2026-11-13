@@ -8,6 +8,9 @@ from fastapi import FastAPI
 from app import models  # noqa: F401  (registra las tablas en SQLModel.metadata)
 from app.database import create_db_and_tables
 
+from app.routers import pokedex_db
+
+#se configura el formato de los mensajes en la terminal
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s · %(message)s"
 )
@@ -33,3 +36,5 @@ app = FastAPI(
 @app.get("/health", tags=["sistema"])
 def health():
     return {"status": "ok"}
+
+app.include_router(pokedex_db.router, prefix="/api/v1")

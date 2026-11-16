@@ -1,6 +1,6 @@
 # Pokédex API
 
-![CI](https://github.com/<organizacion>/pokedex-api/actions/workflows/ci.yml/badge.svg)
+![CI]((https://github.com/mvelasalmi-jpg/practica1_pokedex/actions/workflows/ci.yml/badge.svg))
 
 ## Descripción
 
@@ -18,8 +18,8 @@ Arquitectura: `Cliente → Nuestra API (FastAPI) → SQLite`, y la API consulta 
 
 | Miembro | Usuario Git | Partes desarrolladas |
 |---|---|---|
-| [Nombre 1] | [@usuario1] | [p. ej. estructura base, auth + tests de auth] |
-| [Nombre 2] | [@usuario2] | [p. ej. cliente PokeAPI, Pokédex, equipos, tests, CI] |
+| [Maria Velasco Almirall] | [mvelasalmi] | [estructura base, auth + tests de auth] |
+| [Miguel Montero Moran] | [mmontero89101] | [cliente PokeAPI, Pokédex, equipos, tests, CI] |
 
 ## Instalación
 
@@ -70,10 +70,21 @@ Los tests **no usan internet**: la PokeAPI se sustituye por una versión falsa (
 
 ## Flujo de trabajo y despliegue
 
-- Ramas: `main` (estable, etiquetada `v1.0.0`), `develop` (integración) y una rama `features/<nombre>` por funcionalidad. Todo entra por *pull request* con una aprobación y la integración continua en verde.
-- Mensajes de commit con *Conventional Commits* (`feat(teams): ...`).
-- Tablero de GitHub Projects: [enlace pendiente]
-- Despliegue (opcional): [URL pública y `/docs` si se despliega]
+Para organizar el desarrollo del proyecto se ha utilizado un flujo de trabajo basado en tres tipos de ramas:
+
+- *main*: contiene la versión estable del proyecto, preparada para su entrega.
+- *develop*: rama principal de desarrollo, donde se integran las funcionalidades antes de incorporarlas a la versión estable.
+- **features/***: ramas destinadas al desarrollo de funcionalidades concretas. Una vez terminadas, se integran en develop mediante Pull Requests.
+
+Este sistema permite trabajar en diferentes funcionalidades de forma independiente, mantener organizada la evolución del proyecto y evitar introducir cambios sin revisar directamente en la rama principal.
+
+### Despliegue
+
+El proyecto está preparado para ejecutarse localmente mediante Uvicorn. No se dispone de un despliegue público de la API.
+
+La documentación interactiva de los endpoints está disponible a través de Swagger UI en:
+
+http://localhost:8000/docs
 
 ## Endpoints
 
@@ -104,9 +115,15 @@ Códigos de error habituales: `401` sin token o token no válido, `404` recurso 
 
 ### Rate limiting
 
-- **¿Por qué límites distintos?** Cada endpoint cuesta y arriesga cosas distintas. El registro (5/hora por IP) es público y crea datos: lo limitamos mucho para evitar cuentas basura. El login (10/min) frena los ataques de fuerza bruta contra contraseñas. Los endpoints que llaman a la PokeAPI (30/min) son los más «caros»: cada petición nuestra puede generar varias externas, y no queremos que nos bloqueen a nosotros. Los endpoints normales de Pokédex y equipos (100/min) sólo tocan nuestra base de datos y son más baratos, así que se permite un uso cómodo.
-- **¿Cómo protege a la API?** Evita fuerza bruta, abuso de recursos y que un solo cliente sature el servicio o agote la cuota de la PokeAPI.
-- **¿Qué pasa al excedirlo?** La API responde `429 Too Many Requests`, el intento se anota en el log (`Rate limit excedido`) y el cliente puede volver a intentarlo cuando acabe la ventana de tiempo. Los contadores están en memoria de un proceso (ver *Mejoras futuras*).
+Se han establecido diferentes límites de peticiones dependiendo del tipo de endpoint, teniendo en cuenta su uso y los recursos que consume:
+
+- *Registro (5 peticiones por hora):* es un endpoint público y se limita para evitar registros masivos y posibles abusos.
+- *Pokédex (100 peticiones por minuto):* es una funcionalidad utilizada habitualmente por usuarios autenticados, por lo que permite un mayor número de peticiones.
+- *Búsqueda de Pokémon (30 peticiones por minuto):* tiene un límite intermedio porque realiza consultas a una API externa (PokeAPI), evitando generar un número excesivo de solicitudes.
+
+Esta configuración protege la API frente a abusos, reduce la posibilidad de sobrecargar el servidor y evita un consumo excesivo de recursos externos.
+
+Cuando un usuario supera el límite establecido, la API devuelve una respuesta HTTP *429 (Too Many Requests)*, indicando que se han realizado demasiadas peticiones en un periodo de tiempo.
 
 ### Versionado
 
